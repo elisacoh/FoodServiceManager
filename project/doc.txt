@@ -1,0 +1,88 @@
+src/
+├── services/
+│   ├── types.ts                    # Service type definitions
+│   └── CalculationService.ts       # Main calculation logic
+├── hooks/
+│   └── useIngredientCalculations.ts # React hook for calculations
+└── components/
+    └── RecipeTable.tsx             # Updated to show calculations
+
+Implementation Steps:
+
+Add your calculation logic in CalculationService.ts
+The service provides methods for different calculations
+The hook manages state and triggers calculations
+Components consume the calculations and display results
+
+
+Where to Add Your Calculations:
+
+Look for TODO comments in CalculationService.ts
+Implement your specific logic in these methods:
+calculateHistoricalUsage
+calculateProjectedUsage
+calculateSuggestedQuantity
+
+
+Integration Points:
+
+The calculations automatically update when data changes
+Results are available in components via the hook
+Use the calculations array to display results
+
+
+Usage Example:
+
+// In your component
+const { calculations, isCalculating } = useIngredientCalculations(
+  recipes,
+  sales,
+  orders,
+  inventory
+);
+
+// Use calculations in your render logic
+calculations.forEach(calc => {
+  console.log(
+    `${calc.ingredientName}: ${calc.currentQuantity} → ${calc.suggestedQuantity}`
+  );
+});
+
+
+// src/components/RecipeTable.tsx
+import { useIngredientCalculations } from '../hooks/useIngredientCalculations';
+
+export function RecipeTable({ recipes, orders, sales, inventory, ...props }) {
+  const { calculations, isCalculating } = useIngredientCalculations(
+    recipes,
+    sales,
+    orders,
+    inventory
+  );
+
+  // Add this to your existing JSX where you want to show the calculations
+  const renderCalculations = () => (
+    <div className="mt-4 border-t pt-4">
+      <h3 className="text-lg font-semibold mb-2">Suggested Quantities</h3>
+      {isCalculating ? (
+        <p>Calculating...</p>
+      ) : (
+        <div className="space-y-2">
+          {calculations.map(calc => (
+            <div key={calc.ingredientId} className="flex items-center justify-between">
+              <span>{calc.ingredientName}</span>
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-gray-500">
+                  Current: {calc.currentQuantity}
+                </span>
+                <span className="text-sm font-medium text-blue-600">
+                  Suggested: {calc.suggestedQuantity}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
